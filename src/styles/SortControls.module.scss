@@ -1,26 +1,46 @@
 @use './variables' as *;
 
+
 .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background: $card-bg;
   box-shadow: 0 2px 6px $card-shadow;
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 24px;
+}
+
+.filterGroup,
+.sortGroup {
   display: flex;
   align-items: center;
 }
 
 .label {
+  margin-right: 8px;
   font-weight: 500;
   color: #4a5568;
-  margin-right: 12px;
 }
 
-.select {
-  width: 160px;
+.searchInput {
   padding: 8px;
   border: 1px solid #cbd5e0;
   border-radius: 4px;
+  width: 200px;
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 2px rgba(49,130,206,0.3);
+  }
+}
+
+.select {
+  padding: 8px;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  width: 160px;
   &:focus {
     outline: none;
     border-color: $primary-color;

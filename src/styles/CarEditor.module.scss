@@ -7,11 +7,18 @@
 }
 
 .modal {
+  position: relative;
   background: $card-bg;
   border-radius: 8px;
   padding: 24px;
   width: 320px;
   box-shadow: 0 4px 8px $card-shadow;
+}
+
+.error{
+  color: $danger-color;
+  font-size: 0.875rem;
+  margin-top: 4px;
 }
 
 .title {

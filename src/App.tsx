@@ -5,6 +5,8 @@ import SortControls from './components/SortControls';
 import CarList from './components/CarList';
 import CarEditor from './components/CarEditor';
 import MapView from './components/MapView';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App: React.FC = () => {
   // const carService: ICarService = new CarService();
@@ -14,13 +16,18 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [editingCar, setEditingCar] = useState<Car | null>(null);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
   const load = async () => {
     setLoading(true);
     try {
       const data = await carService.fetchAll();
       setCars(data);
+      toast.success('Cars loaded successfully!');
+
     } catch (err) {
       console.error(err);
+      toast.error('Failed to load cars.');
     } finally {
       setLoading(false);
     }
@@ -28,10 +35,19 @@ const App: React.FC = () => {
 
   useEffect(() => { load(); }, []);
 
+  const filteredCars = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    return cars.filter(c =>
+      c.name.toLowerCase().includes(q) ||
+      c.model.toLowerCase().includes(q)
+    );
+  }, [cars, searchQuery]);
+
   const sortedCars = useMemo(() => {
-    if (!sortedBy) return cars;
-    return [...cars].sort((a, b) => a[sortedBy] - b[sortedBy]);
-  }, [cars, sortedBy]);
+    if (!sortedBy) return filteredCars;
+    return [...filteredCars].sort((a, b) => a[sortedBy] - b[sortedBy]);
+  }, [filteredCars, sortedBy]);
+
 
   const handleEdit = (car: Car) => setEditingCar(car);
 
@@ -47,34 +63,35 @@ const App: React.FC = () => {
   //  };
 
   // просто обновляем локальный state
-  const handleSave = (id: number, name: string, price: number) => {
-    setCars(prev =>
-      prev.map(c => (c.id === id ? { ...c, name, price } : c))
-    );
-    setEditingCar(null);
-  };
+const handleSave = (id: number, name: string, price: number) => {
+  setCars(prev => prev.map(c => c.id === id ? { ...c, name, price } : c));
+  setEditingCar(null);
+  toast.success('Car saved successfully!');
+};
 
   // const handleDelete = async (id: number) => {
   //   await carService.delete(id);
   //   load();
   // };
 
-     const handleSelect = (car: Car) => {
-     setSelectedCar(car);
-   };
+  const handleSelect = (car: Car) => {
+    setSelectedCar(car);
+  };
 
-   
+
 
   // удаляем из локального state
-  const handleDelete = (id: number) => {
-    if (window.confirm('Удалить эту машину?')) {
-      setCars(prev => prev.filter(c => c.id !== id));
-    }
-  };
+const handleDelete = (id: number) => {
+  if (window.confirm('Delete this car?')) {
+    setCars(prev => prev.filter(c => c.id !== id));
+    toast.info('Car deleted.');
+  }
+};
   const handleCancel = () => setEditingCar(null);
 
   return (
     <div className="p-4">
+      <ToastContainer position="bottom-right" />
       {editingCar && (
         <CarEditor
           car={editingCar}
@@ -83,19 +100,23 @@ const App: React.FC = () => {
         />
       )}
       <h1 className="text-2xl mb-4">Car SPA</h1>
-      <SortControls onChange={setSortedBy} />
+      <SortControls
+        onChange={setSortedBy}
+        onSearch={setSearchQuery}
+      />
       {loading ? (
         <p>Loading...</p>
       ) : (
-            <CarList
-              cars={sortedCars}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onSelect={handleSelect}   
-            />
+        <CarList
+          cars={sortedCars}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onSelect={handleSelect}
+        />
       )}
       <MapView cars={cars} focusCar={selectedCar} />
     </div>
+    
   );
 };
 

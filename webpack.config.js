@@ -20,6 +20,15 @@ module.exports = {
         exclude: /node_modules/,
       },
 
+      // Добавляем поддержку plain CSS (для react-toastify и любых других)
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader',
+        ]
+      },
+
       // 2) SCSS‑модули (*.module.scss)
       {
         test: /\.module\.s[ac]ss$/,
